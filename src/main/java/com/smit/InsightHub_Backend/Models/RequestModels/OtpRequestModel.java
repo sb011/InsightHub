@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerificationRequestModel {
-    String code;
+public class OtpRequestModel {
     String userId;
     String email;
 }

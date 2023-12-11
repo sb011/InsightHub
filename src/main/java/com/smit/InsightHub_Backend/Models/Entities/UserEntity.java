@@ -11,4 +11,5 @@ public class UserEntity extends BaseEntity {
     private String username;
     private String email;
     private String password;
+    private boolean isVerified = false;
 }
