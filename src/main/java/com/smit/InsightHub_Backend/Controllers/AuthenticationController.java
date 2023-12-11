@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.smit.InsightHub_Backend.Models.RequestModels.LoginRequestModel;
 import com.smit.InsightHub_Backend.Models.RequestModels.RegisterRequestModel;
+import com.smit.InsightHub_Backend.Models.RequestModels.VerificationRequestModel;
 import com.smit.InsightHub_Backend.Models.ResponseModels.LoginResponseModel;
+import com.smit.InsightHub_Backend.Models.ResponseModels.RegisterResponseModel;
 import com.smit.InsightHub_Backend.Services.Interfaces.IAuthenticationService;
 
 @RestController
@@ -27,7 +29,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public LoginResponseModel register(@RequestBody RegisterRequestModel registerRequest) {
+    public RegisterResponseModel register(@RequestBody RegisterRequestModel registerRequest) {
         return authenticationService.register(registerRequest);
+    }
+
+    @PostMapping("/verify")
+    public LoginResponseModel verify(@RequestBody VerificationRequestModel verificationRequest) {
+        return authenticationService.verify(verificationRequest);
     }
 }

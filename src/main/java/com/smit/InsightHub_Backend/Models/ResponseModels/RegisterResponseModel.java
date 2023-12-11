@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseModel {
-    private String accessToken;
+public class RegisterResponseModel {
+    private String userId;
 }
