@@ -22,6 +22,7 @@ import com.smit.InsightHub_Backend.Models.RequestModels.RegisterRequestModel;
 import com.smit.InsightHub_Backend.Models.RequestModels.VerificationRequestModel;
 import com.smit.InsightHub_Backend.Models.ResponseModels.LoginResponseModel;
 import com.smit.InsightHub_Backend.Models.ResponseModels.RegisterResponseModel;
+import com.smit.InsightHub_Backend.Models.ResponseModels.UserResponseModel;
 import com.smit.InsightHub_Backend.Repositories.Interfaces.IUserRepository;
 import com.smit.InsightHub_Backend.Services.Interfaces.IAuthenticationService;
 
@@ -45,11 +46,14 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public LoginResponseModel login(LoginRequestModel loginRequestModel) {
-        if (loginRequestModel.getEmail() == null) {
+        // email null or empty
+        if (loginRequestModel.getEmail().isEmpty() || loginRequestModel.getEmail() == null
+                || loginRequestModel.getEmail().isBlank()) {
             throw new BadRequestException("Email is required");
         }
 
-        if (loginRequestModel.getPassword() == null) {
+        if (loginRequestModel.getPassword().isEmpty() || loginRequestModel.getPassword() == null
+                || loginRequestModel.getPassword().isBlank()) {
             throw new BadRequestException("Password is required");
         }
 
@@ -63,22 +67,26 @@ public class AuthenticationService implements IAuthenticationService {
         }
 
         String token = jwtHelper.generateToken(user.getId());
-        var response = new LoginResponseModel(token);
+        var response = new LoginResponseModel(token,
+                new UserResponseModel(user.getId(), user.getUsername(), user.getEmail()));
 
         return response;
     }
 
     @Override
     public RegisterResponseModel register(RegisterRequestModel loginRequestModel) {
-        if (loginRequestModel.getEmail() == null) {
+        if (loginRequestModel.getEmail().isEmpty() || loginRequestModel.getEmail() == null
+                || loginRequestModel.getEmail().isBlank()) {
             throw new BadRequestException("Email is required");
         }
 
-        if (loginRequestModel.getUsername() == null) {
+        if (loginRequestModel.getUsername().isEmpty() || loginRequestModel.getUsername() == null
+                || loginRequestModel.getUsername().isBlank()) {
             throw new BadRequestException("Username is required");
         }
 
-        if (loginRequestModel.getPassword() == null) {
+        if (loginRequestModel.getPassword().isEmpty() || loginRequestModel.getPassword() == null
+                || loginRequestModel.getPassword().isBlank()) {
             throw new BadRequestException("Password is required");
         }
 
@@ -101,13 +109,15 @@ public class AuthenticationService implements IAuthenticationService {
 
         sendOTP(new OtpRequestModel(user.getId(), user.getEmail()));
 
-        var response = new RegisterResponseModel(user.getId());
+        var response = new RegisterResponseModel(
+                new UserResponseModel(user.getId(), user.getUsername(), user.getEmail()));
         return response;
     }
 
     @Override
     public LoginResponseModel verify(VerificationRequestModel verificationRequest) {
-        if (verificationRequest.getCode() == null) {
+        if (verificationRequest.getCode().isEmpty() || verificationRequest.getCode() == null
+                || verificationRequest.getCode().isBlank()) {
             throw new BadRequestException("Code is required");
         }
 
@@ -121,9 +131,10 @@ public class AuthenticationService implements IAuthenticationService {
         }
 
         String token = jwtHelper.generateToken(verificationRequest.getUserId());
-        var response = new LoginResponseModel(token);
-
         var user = userRepository.findById(verificationRequest.getUserId()).get();
+        var response = new LoginResponseModel(token,
+                new UserResponseModel(user.getId(), user.getUsername(), user.getEmail()));
+
         user.setVerified(true);
         userRepository.save(user);
 
@@ -132,11 +143,13 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public void sendOTP(OtpRequestModel verificationRequest) {
-        if (verificationRequest.getUserId() == null) {
+        if (verificationRequest.getUserId().isEmpty() || verificationRequest.getUserId() == null
+                || verificationRequest.getUserId().isBlank()) {
             throw new BadRequestException("User Id is required");
         }
 
-        if (verificationRequest.getEmail() == null) {
+        if (verificationRequest.getEmail().isEmpty() || verificationRequest.getEmail() == null
+                || verificationRequest.getEmail().isBlank()) {
             throw new BadRequestException("Email is required");
         }
 
@@ -172,7 +185,9 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public void sendForgotPasswordLink(SendForgotPasswordLinkRequestModel sendForgotPasswordLinkRequestModel) {
-        if (sendForgotPasswordLinkRequestModel.getEmail() == null) {
+        if (sendForgotPasswordLinkRequestModel.getEmail().isEmpty()
+                || sendForgotPasswordLinkRequestModel.getEmail() == null
+                || sendForgotPasswordLinkRequestModel.getEmail().isBlank()) {
             throw new BadRequestException("Email is required");
         }
 
@@ -184,6 +199,7 @@ public class AuthenticationService implements IAuthenticationService {
         var subject = "InsightHub - Reset Your Password";
         var body = "Dear User,\n\n"
                 + "We received a request to reset your password."
+                + "http://localhost:3000/forgot-password/ " + user.getId() + ""
                 + "If you did not request this code, please ignore this email.\n\n"
                 + "Thank you,\n"
                 + "InsightHub Team";
@@ -197,15 +213,17 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public void forgotPassword(ForgotPasswordRequestModel forgotPasswordRequestModel) {
-        if (forgotPasswordRequestModel.getEmail() == null) {
+        if (forgotPasswordRequestModel.getId().isEmpty() || forgotPasswordRequestModel.getId() == null
+                || forgotPasswordRequestModel.getId().isBlank()) {
             throw new BadRequestException("Email is required");
         }
 
-        if (forgotPasswordRequestModel.getPassword() == null) {
+        if (forgotPasswordRequestModel.getPassword().isEmpty() || forgotPasswordRequestModel.getPassword() == null
+                || forgotPasswordRequestModel.getPassword().isBlank()) {
             throw new BadRequestException("Password is required");
         }
 
-        var user = userRepository.findByEmail(forgotPasswordRequestModel.getEmail());
+        var user = userRepository.findById(forgotPasswordRequestModel.getId()).get();
         if (user == null) {
             throw new NotFoundException("User not found");
         }
@@ -216,11 +234,13 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public void resetPassword(ResetPasswordRequestModel resetPasswordRequestModel) {
-        if (resetPasswordRequestModel.getEmail() == null) {
+        if (resetPasswordRequestModel.getEmail().isEmpty() || resetPasswordRequestModel.getEmail() == null
+                || resetPasswordRequestModel.getEmail().isBlank()) {
             throw new BadRequestException("Email is required");
         }
 
-        if (resetPasswordRequestModel.getOldPassword() == null) {
+        if (resetPasswordRequestModel.getOldPassword().isEmpty() || resetPasswordRequestModel.getOldPassword() == null
+                || resetPasswordRequestModel.getOldPassword().isBlank()) {
             throw new BadRequestException("Old Password is required");
         }
 
@@ -229,11 +249,14 @@ public class AuthenticationService implements IAuthenticationService {
             throw new NotFoundException("User not found");
         }
 
-        if (resetPasswordRequestModel.getNewPassword() == null) {
+        if (resetPasswordRequestModel.getNewPassword().isEmpty() || resetPasswordRequestModel.getNewPassword() == null
+                || resetPasswordRequestModel.getNewPassword().isBlank()) {
             throw new BadRequestException("New Password is required");
         }
 
-        if (resetPasswordRequestModel.getReNewPassword() == null) {
+        if (resetPasswordRequestModel.getReNewPassword().isEmpty()
+                || resetPasswordRequestModel.getReNewPassword() == null
+                || resetPasswordRequestModel.getReNewPassword().isBlank()) {
             throw new BadRequestException("Re-enter New Password is required");
         }
 

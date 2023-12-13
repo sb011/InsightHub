@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterResponseModel {
-    private String userId;
+    private UserResponseModel user;
 }

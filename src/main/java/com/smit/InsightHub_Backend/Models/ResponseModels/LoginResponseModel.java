@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponseModel {
     private String accessToken;
+    private UserResponseModel user;
 }
